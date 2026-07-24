@@ -1,6 +1,8 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { useState, useRef, useEffect } from "react";
 
 interface Message {
@@ -92,7 +94,7 @@ export default function Home() {
     e.stopPropagation();
     const updated = conversations.filter(c => c.id !== idToDelete);
     setConversations(updated);
-    
+
     let nextActive = activeId;
     if (activeId === idToDelete) {
       nextActive = updated.length > 0 ? updated[0].id : null;
@@ -159,7 +161,7 @@ export default function Home() {
       });
 
       const data = await res.json();
-      
+
       // Update conversation with assistant response
       const botResponseMsg: Message = { role: "assistant", text: data.response };
       const updatedAfterResponse = sorted.map(c => {
@@ -176,12 +178,12 @@ export default function Home() {
       saveToStorage(updatedAfterResponse, currentActiveId);
     } catch (error) {
       console.error("Error communicating with chatbot API:", error);
-      
-      const errorMsg: Message = { 
-        role: "assistant", 
-        text: "**Failed to connect to AI server.** Please make sure the backend is running locally on port `8000`." 
+
+      const errorMsg: Message = {
+        role: "assistant",
+        text: "**Failed to connect to AI server.** Please make sure the backend is running locally on port `8000`."
       };
-      
+
       const updatedAfterError = sorted.map(c => {
         if (c.id === currentActiveId) {
           return {
@@ -209,7 +211,7 @@ export default function Home() {
   return (
     <div className="app-container">
       {/* Mobile Sidebar Overlay */}
-      <div 
+      <div
         className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`}
         onClick={() => setSidebarOpen(false)}
       />
@@ -241,10 +243,10 @@ export default function Home() {
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input 
-              type="text" 
-              className="search-input" 
-              placeholder="Search chats..." 
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search chats..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -254,8 +256,8 @@ export default function Home() {
         <div className="sidebar-history">
           {filteredConversations.length > 0 ? (
             filteredConversations.map((conv) => (
-              <div 
-                key={conv.id} 
+              <div
+                key={conv.id}
                 className={`chat-card ${conv.id === activeId ? "active" : ""}`}
                 onClick={() => {
                   setActiveId(conv.id);
@@ -269,8 +271,8 @@ export default function Home() {
                   </svg>
                   <span className="chat-card-title">{conv.title}</span>
                 </div>
-                <button 
-                  className="btn-delete-chat" 
+                <button
+                  className="btn-delete-chat"
                   onClick={(e) => deleteChat(e, conv.id)}
                   title="Delete chat"
                 >
@@ -301,8 +303,8 @@ export default function Home() {
       <main className="main-content">
         <header className="chat-header">
           <div className="header-left">
-            <button 
-              className="btn-hamburger" 
+            <button
+              className="btn-hamburger"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open Sidebar"
             >
@@ -327,8 +329,8 @@ export default function Home() {
         <div className="chat-messages-container">
           {activeConversation && activeConversation.messages.length > 0 ? (
             activeConversation.messages.map((msg, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`message-wrapper ${msg.role === "user" ? "user" : "assistant"}`}
               >
                 <div className="message-container">
@@ -348,7 +350,9 @@ export default function Home() {
                       <div>{msg.text}</div>
                     ) : (
                       <div className="markdown-content">
-                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                          {msg.text}
+                        </ReactMarkdown>
                       </div>
                     )}
                   </div>
@@ -367,29 +371,29 @@ export default function Home() {
                 Ask about education planning, general advice, coding tasks, or try one of the suggestions below to get started.
               </p>
               <div className="empty-state-suggestions">
-                <div 
-                  className="suggestion-card" 
+                <div
+                  className="suggestion-card"
                   onClick={() => handleSuggestionClick("Create a step-by-step roadmap to learn web development in 2026.")}
                 >
                   <div className="suggestion-card-title">Study Plan</div>
                   <div className="suggestion-card-desc">Create a roadmap to learn web development.</div>
                 </div>
-                <div 
-                  className="suggestion-card" 
+                <div
+                  className="suggestion-card"
                   onClick={() => handleSuggestionClick("Explain how database indexes speed up lookups like I am 5.")}
                 >
                   <div className="suggestion-card-title">Explain Concept</div>
                   <div className="suggestion-card-desc">Explain database indexes simply.</div>
                 </div>
-                <div 
-                  className="suggestion-card" 
+                <div
+                  className="suggestion-card"
                   onClick={() => handleSuggestionClick("Recommend 5 core elements of clean dark-mode UI design.")}
                 >
                   <div className="suggestion-card-title">Design Guidelines</div>
                   <div className="suggestion-card-desc">Elements of clean dark-mode design.</div>
                 </div>
-                <div 
-                  className="suggestion-card" 
+                <div
+                  className="suggestion-card"
                   onClick={() => handleSuggestionClick("Show me a template for a clean markdown tables format.")}
                 >
                   <div className="suggestion-card-title">Markdown Formatting</div>
@@ -428,11 +432,11 @@ export default function Home() {
         <footer className="chat-footer">
           <div className="input-container-wrapper">
             <div className="input-box">
-              <textarea 
+              <textarea
                 ref={textareaRef}
-                className="chat-textarea" 
+                className="chat-textarea"
                 rows={1}
-                placeholder="Ask Ares anything..." 
+                placeholder="Ask Ares anything..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => {
@@ -442,8 +446,8 @@ export default function Home() {
                   }
                 }}
               />
-              <button 
-                className="btn-send" 
+              <button
+                className="btn-send"
                 onClick={sendMessage}
                 disabled={!message.trim() || loading}
                 aria-label="Send message"
