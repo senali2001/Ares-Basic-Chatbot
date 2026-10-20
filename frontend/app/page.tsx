@@ -149,7 +149,8 @@ export default function Home() {
     saveToStorage(sorted, currentActiveId);
 
     try {
-      const res = await fetch("http://localhost:8000/chat", {
+      const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+      const res = await fetch(`${apiBaseUrl}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -181,7 +182,7 @@ export default function Home() {
 
       const errorMsg: Message = {
         role: "assistant",
-        text: "**Failed to connect to AI server.** Please make sure the backend is running locally on port `8000`."
+        text: "**Failed to connect to the AI server.** Please check that the backend is running and reachable."
       };
 
       const updatedAfterError = sorted.map(c => {

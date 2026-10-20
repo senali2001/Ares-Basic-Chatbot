@@ -15,7 +15,6 @@ load_dotenv()
 
 # This key is needed to connect to Groq API and use their language model services
 groq_api_key = os.getenv("GROQ_API_KEY")
-print("Groq API Key:", groq_api_key)
 mongo_uri = os.getenv("MONGODB_URI")
 
 client = MongoClient(mongo_uri)
@@ -102,6 +101,5 @@ def chat(request: ChatRequest):
              "timestamp": datetime.utcnow()
     })
         return {"response": response.content}
-
 
 
